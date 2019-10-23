@@ -125,7 +125,14 @@ len(by_query), sorted(by_query.keys())
 #%%
 with open("data/section.qrel", "w") as out:
     for pl in passage_labels:
+        if pl.header_id is None:
+            continue
+        if pl.header_id == "INTRODUCTION":
+            continue
+        if pl.header_id == "NONE_OF_THESE":
+            continue
+
         print(
-            "{0} 0 {1} {2}".format(pl.section_qid(), pl.paragraph_id, pl.int_score()),
+            "{0} 0 {1} {2}".format(pl.header_id, pl.paragraph_id, pl.int_score()),
             file=out,
         )
