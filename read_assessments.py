@@ -14,6 +14,9 @@ class QueryPassageLabel(object):
     header_id = attr.ib(type=Optional[str])
     relevance_level = attr.ib(type=str)
 
+    def section_qid(self) -> str:
+        return "{0}/{1}".format(self.query_id, self.header_id)
+
     def int_score(self) -> int:
         label = self.relevance_level
         if label == "NonRel":
@@ -99,6 +102,7 @@ class LabelSavedData(object):
 
 
 #%%
+
 passage_labels = []
 transition_labels = []
 
@@ -119,3 +123,9 @@ by_query = Counter([p.query_id for p in passage_labels])
 len(by_query), sorted(by_query.keys())
 
 #%%
+with open("data/section.qrel", "w") as out:
+    for pl in passage_labels:
+        print(
+            "{0} 0 {1} {2}".format(pl.section_qid(), pl.paragraph_id, pl.int_score()),
+            file=out,
+        )
