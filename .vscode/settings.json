@@ -1,0 +1,8 @@
+{
+    "python.pythonPath": "/Users/jfoley/code/car2019eval/venv/bin/python3.7",
+    "python.formatting.provider": "black",
+    "editor.formatOnSave": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.mypyEnabled": true,
+    "python.linting.enabled": true
+}
