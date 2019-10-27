@@ -1,5 +1,7 @@
 #%%
-from to_section_trecrun import convert_to_section_trecrun
+import matplotlib.pyplot as plt
+%matplotlib inline
+from to_trecrun import convert_to_section_trecrun
 from invoke_treceval import execute_treceval
 import os
 import numpy as np
@@ -51,9 +53,8 @@ with open(SECTION_QREL_FILE) as fp:
 print("Using {0} query ids for comparison:".format(len(query_ids)))
 
 #%%
-measure = "ndcg"
+run_id_to_measures = {}
 
-boxplot_data = []
 for run_id in tqdm(RUN_IDS):
     input_path = "data/car_runs/{0}.gz".format(run_id)
     trecrun_path = "data/trecrun/{0}.section.trecrun".format(run_id)
@@ -64,15 +65,18 @@ for run_id in tqdm(RUN_IDS):
         runid, data = execute_treceval(SECTION_QREL_FILE, trecrun_path)
     except ValueError as e:
         raise ValueError("{0}: {1}".format(runid, e))
+    run_id_to_measures[run_id] = data
+
+#%%
+measure = "map"
+boxplot_data = []
+
+for run_id in RUN_IDS:
+    data = run_id_to_measures[run_id]
     measure_vec = np.array([data[qid].get(measure, 0.0) for qid in sorted(query_ids)])
     boxplot_data.append((np.median(measure_vec), run_id, measure_vec))
 
-
 #%%
-%matplotlib inline
-
-#%%
-import matplotlib.pyplot as plt
 
 plt.style.use('ggplot')
 
@@ -87,10 +91,8 @@ ax = fig.add_subplot(1, 1, 1) # nrows, ncols, index
     #ax.spines[pos].set_color('black')
 plt.boxplot(xs,labels=labels,showmeans=True,meanline=True,notch=False)
 plt.xticks(rotation=90,color='black')
-plt.savefig('per-heading-ndcg.png', transparent=False, bbox_inches='tight', facecolor='white')
+plt.savefig('per-heading-{0}.png'.format(measure), transparent=False, bbox_inches='tight', facecolor='white')
 plt.show()
 
 
-#%%
-rcParams
 #%%

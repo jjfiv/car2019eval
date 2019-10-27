@@ -20,7 +20,7 @@ def execute_treceval(
     assert os.path.isfile(qrel)
     assert os.path.exists(runfile)
     assert os.path.isfile(runfile)
-    eval_cmd = [TREC_EVAL_BIN, "-q", "-m", "all_trec", qrel, runfile]
+    eval_cmd = [TREC_EVAL_BIN, "-q", "-c", "-m", "all_trec", qrel, runfile]
     completed = subprocess.run(eval_cmd, capture_output=True)
     if completed.returncode != 0:
         raise ValueError(
@@ -53,7 +53,7 @@ def execute_treceval(
 
 if __name__ == "__main__":
     runid, data = execute_treceval("data/section.qrel", "data/UNH-bm25-ecmpsg.trecrun")
-    distr = [q["ndcg"] for qid, q in data.items()]
+    distr = [q["ndcg_cut_20"] for qid, q in data.items()]
     print(len(distr))
     print(np.mean(distr))
     print(np.percentile(distr, 50))
