@@ -1,6 +1,6 @@
 #%%
 import matplotlib.pyplot as plt
-%matplotlib inline
+#%matplotlib inline
 from to_trecrun import convert_to_section_trecrun
 from invoke_treceval import execute_treceval
 import os
@@ -89,7 +89,7 @@ ax = fig.add_subplot(1, 1, 1) # nrows, ncols, index
 #ax.set_facecolor('white')
 #for pos in ['bottom', 'left', 'top', 'right']:
     #ax.spines[pos].set_color('black')
-plt.boxplot(xs,labels=labels,showmeans=True,meanline=True,notch=False)
+plt.boxplot(xs,labels=labels,meanline=True,notch=False)
 plt.xticks(rotation=90,color='black')
 plt.savefig('per-heading-{0}.png'.format(measure), transparent=False, bbox_inches='tight', facecolor='white')
 plt.show()
