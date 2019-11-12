@@ -7,43 +7,7 @@ import os
 import numpy as np
 from tqdm import tqdm
 import math
-
-RUN_INFO = [
-{'id': 'Bert-ConvKNRM-50', 'bert': True},
-{'id': 'Bert-ConvKNRM', 'bert': True},
-{'id': 'Bert-DRMMTKS', 'bert': True},
-{'id': 'ECNU_BM25', 'bert': False},
-{'id': 'ECNU_BM25_1', 'bert': False},
-{'id': 'ECNU_ReRank1', 'bert': False, 'neural': True},
-{'id': 'ICT-BM25', 'neural': True},
-{'id': 'ICT-DRMMTKS', 'neural': True},
-{'id': 'IRIT_run1', 'neural': False},
-{'id': 'IRIT_run2', 'neural': False},
-{'id': 'IRIT_run3', 'neural': False},
-{'id': 'ReRnak2_BERT', 'bert': True},
-{'id': 'ReRnak3_BERT', 'bert': True},
-{'id': 'UNH-bm25-ecmpsg'},
-{'id': 'UNH-bm25-rm'},
-{'id': 'UNH-bm25-stem'},
-{'id': 'UNH-dl100', 'neural': True},
-{'id': 'UNH-dl300', 'neural': True},
-{'id': 'UNH-ecn'},
-{'id': 'UNH-qee'},
-# Malformed:
-# {'id': 'neural', 'neural': True},
-{'id': 'UNH-tfidf-lem'},
-{'id': 'UNH-tfidf-ptsim'},
-{'id': 'UNH-tfidf-stem'},
-{'id': 'UvABM25RM3'},
-{'id': 'UvABottomUp1'},
-{'id': 'UvABottomUp2'},
-{'id': 'UvABottomUpChangeOrder'},
-{'id': 'bm25-populated'},
-{'id': 'dangnt-nlp', 'bert': True},
-]
-
-RUN_INFO_BY_ID = dict((dat['id'], dat) for dat in RUN_INFO)
-RUN_IDS = list(RUN_INFO_BY_ID.keys())
+from run_info import RUN_IDS, RUN_INFO, RUN_INFO_BY_ID
 
 SECTION_QREL_FILE = "data/section.qrel"
 

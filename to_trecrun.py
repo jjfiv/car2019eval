@@ -5,7 +5,7 @@ import gzip
 import argparse
 import json
 from collections import defaultdict
-from typing import DefaultDict, Set, Optional
+from typing import DefaultDict, Set, Optional, Tuple
 
 #%%
 @attr.s
@@ -73,6 +73,18 @@ class QueryOutput(object):
         for i in range(len(paras) - 1):
             pairs.append((paras[i], paras[i + 1]))
         return pairs
+
+
+def get_paragraph_transitions(input: str) -> Dict[str, List[Tuple[str, str]]]:
+    found = {}
+    with gzip.open(input, "rt") as fp:
+        for line in fp:
+            query_dict = json.loads(line)
+            if "query_facets" not in query_dict:
+                query_dict["query_facets"] = []
+            query = QueryOutput(**query_dict)
+            found[query.squid] = query.paragraph_transitions()
+    return found
 
 
 def convert_to_section_trecrun(input: str, output: str):

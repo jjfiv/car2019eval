@@ -3,7 +3,7 @@ import os
 import glob
 import ujson as json
 import attr
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Any
 
 
 #%%
@@ -45,6 +45,9 @@ class TransitionLabel(object):
         else:
             assert self.label == "AppropriateTransition"
             return 2
+
+    def to_dict(self) -> Dict[str, Any]:
+        return attr.asdict(self)
 
 
 #%%
@@ -136,3 +139,7 @@ with open("data/section.qrel", "w") as out:
             "{0} 0 {1} {2}".format(pl.header_id, pl.paragraph_id, pl.int_score()),
             file=out,
         )
+
+with open("data/transitions.json", "w") as fp:
+    data = {"labels": [tl.to_dict() for tl in transition_labels]}
+    json.dump(data, fp)
