@@ -105,3 +105,5 @@ plt.boxplot(xs,labels=labels,meanline=True,notch=False)
 plt.xticks(rotation=90, color='black')
 plt.savefig('per-query-coherence.png', transparent=False, bbox_inches='tight', facecolor='white')
 plt.show()
+
+# %%
