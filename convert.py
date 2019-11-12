@@ -1,43 +1,48 @@
 #%%
 import matplotlib.pyplot as plt
-#%matplotlib inline
+%matplotlib inline
 from to_trecrun import convert_to_section_trecrun
 from invoke_treceval import execute_treceval
 import os
 import numpy as np
 from tqdm import tqdm
 
-RUN_IDS = """
-Bert-ConvKNRM-50
-Bert-ConvKNRM
-Bert-DRMMTKS
-ECNU_BM25
-ECNU_BM25_1
-ECNU_ReRank1
-ICT-BM25
-ICT-DRMMTKS
-IRIT_run1
-IRIT_run2
-IRIT_run3
-ReRnak2_BERT
-ReRnak3_BERT
-UNH-bm25-ecmpsg
-UNH-bm25-rm
-UNH-bm25-stem
-UNH-dl100
-UNH-dl300
-UNH-ecn
-UNH-qee
-UNH-tfidf-lem
-UNH-tfidf-ptsim
-UNH-tfidf-stem
-UvABM25RM3
-UvABottomUp1
-UvABottomUp2
-UvABottomUpChangeOrder
-bm25-populated
-dangnt-nlp
-""".strip().split()
+RUN_INFO = [
+{'id': 'Bert-ConvKNRM-50', 'bert': True},
+{'id': 'Bert-ConvKNRM', 'bert': True},
+{'id': 'Bert-DRMMTKS', 'bert': True},
+{'id': 'ECNU_BM25', 'bert': False},
+{'id': 'ECNU_BM25_1', 'bert': False},
+{'id': 'ECNU_ReRank1', 'bert': False, 'neural': True},
+{'id': 'ICT-BM25', 'neural': True},
+{'id': 'ICT-DRMMTKS', 'neural': True},
+{'id': 'IRIT_run1', 'neural': False},
+{'id': 'IRIT_run2', 'neural': False},
+{'id': 'IRIT_run3', 'neural': False},
+{'id': 'ReRnak2_BERT', 'bert': True},
+{'id': 'ReRnak3_BERT', 'bert': True},
+{'id': 'UNH-bm25-ecmpsg'},
+{'id': 'UNH-bm25-rm'},
+{'id': 'UNH-bm25-stem'},
+{'id': 'UNH-dl100', 'neural': True},
+{'id': 'UNH-dl300', 'neural': True},
+{'id': 'UNH-ecn'},
+{'id': 'UNH-qee'},
+# Malformed:
+# {'id': 'neural', 'neural': True},
+{'id': 'UNH-tfidf-lem'},
+{'id': 'UNH-tfidf-ptsim'},
+{'id': 'UNH-tfidf-stem'},
+{'id': 'UvABM25RM3'},
+{'id': 'UvABottomUp1'},
+{'id': 'UvABottomUp2'},
+{'id': 'UvABottomUpChangeOrder'},
+{'id': 'bm25-populated'},
+{'id': 'dangnt-nlp', 'bert': True},
+]
+
+RUN_INFO_BY_ID = dict((dat['id'], dat) for dat in RUN_INFO)
+RUN_IDS = list(RUN_INFO_BY_ID.keys())
 
 SECTION_QREL_FILE = "data/section.qrel"
 
@@ -68,13 +73,24 @@ for run_id in tqdm(RUN_IDS):
     run_id_to_measures[run_id] = data
 
 #%%
-measure = "map"
+measure = "ndcg"
 boxplot_data = []
+
+def run_is_bert(name):
+    return RUN_INFO_BY_ID[name].get("bert", False)
+def run_is_neural(name):
+    info = RUN_INFO_BY_ID[name]
+    return info.get("bert", False) or info.get("neural", False)
 
 for run_id in RUN_IDS:
     data = run_id_to_measures[run_id]
+    name = run_id
+    if run_is_neural(run_id):
+        name += '*'
+    if run_is_bert(run_id):
+        name += '#'
     measure_vec = np.array([data[qid].get(measure, 0.0) for qid in sorted(query_ids)])
-    boxplot_data.append((np.median(measure_vec), run_id, measure_vec))
+    boxplot_data.append((np.median(measure_vec), name, measure_vec))
 
 #%%
 
@@ -90,7 +106,7 @@ ax = fig.add_subplot(1, 1, 1) # nrows, ncols, index
 #for pos in ['bottom', 'left', 'top', 'right']:
     #ax.spines[pos].set_color('black')
 plt.boxplot(xs,labels=labels,meanline=True,notch=False)
-plt.xticks(rotation=90,color='black')
+plt.xticks(rotation=90, color='black')
 plt.savefig('per-heading-{0}.png'.format(measure), transparent=False, bbox_inches='tight', facecolor='white')
 plt.show()
 
