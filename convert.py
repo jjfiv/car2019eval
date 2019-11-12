@@ -6,6 +6,7 @@ from invoke_treceval import execute_treceval
 import os
 import numpy as np
 from tqdm import tqdm
+import math
 
 RUN_INFO = [
 {'id': 'Bert-ConvKNRM-50', 'bert': True},
@@ -112,3 +113,59 @@ plt.show()
 
 
 #%%
+
+def pairwise(baseline, treatment):
+    """
+    Derived shamelessly from the Galago impl.
+    """
+    N = len(baseline)
+    base_mean = np.mean(baseline)
+    treat_mean = np.mean(treatment)
+    difference = treat_mean - base_mean
+    batch = 10000
+
+    maxIterWithoutMatch = 1_000_000
+    iterations = 0
+    matches =  0
+
+    left_sample = np.zeros(N)
+    right_sample = np.zeros(N)
+
+    p_value = 0.0
+    while True:
+        print(iterations)
+        for i in range(batch):
+            swaps = np.random.choice(a=[False, True], size=N)
+            for j in range(N):
+                if swaps[j]:
+                    left_sample[j] = baseline[j]
+                    right_sample[j] = treatment[j]
+                else:
+                    left_sample[j] = treatment[j]
+                    right_sample[j] = baseline[j]
+            sample_difference = np.mean(left_sample) - np.mean(right_sample)
+            if difference <= sample_difference:
+                matches += 1
+        iterations += batch
+        p_value = matches / iterations
+
+        if matches == 0:
+            if iterations < maxIterWithoutMatch:
+                print("no-match-continue")
+                continue
+            else:
+                break
+        
+        max_deviation = max(0.0000005 / p_value, min(0.00005 / p_value, 0.05))
+        est_iter = math.sqrt(p_value * (1.0 - p_value)) / max_deviation
+        if est_iter < iterations:
+            print("est_iter", est_iter, "iterations", iterations)
+            break
+    return p_value
+
+
+# %%
+print(pairwise(xs[4], xs[3]))
+
+
+# %%
